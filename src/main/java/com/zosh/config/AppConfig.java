@@ -1,3 +1,81 @@
+//package com.zosh.config;
+//
+//import java.util.Arrays;
+//import java.util.Collections;
+//
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.http.HttpMethod;
+//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+//import org.springframework.security.config.http.SessionCreationPolicy;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.web.SecurityFilterChain;
+//import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+//import org.springframework.web.cors.CorsConfiguration;
+//import org.springframework.web.cors.CorsConfigurationSource;
+//
+//import javax.servlet.http.HttpServletRequest;
+//
+//@Configuration
+//public class AppConfig {
+//	
+//	@Bean
+//	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//		
+//		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//		.and()
+//		.authorizeHttpRequests(Authorize -> Authorize
+//				.antMatchers("/api/**",
+//						     "api/payments/orderId"
+//						     ).authenticated()
+//				.anyRequest().permitAll()
+//				)
+//		.addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
+//		.csrf().disable()
+//		.cors().configurationSource(new CorsConfigurationSource() {
+//					
+//					@Override
+//					public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+//						
+//						CorsConfiguration cfg = new CorsConfiguration();
+//						
+//						cfg.setAllowedOrigins(Arrays.asList(
+//								
+//								"http://localhost:3000"
+//					
+//								
+//							)
+//						);
+//						//cfg.setAllowedMethods(Arrays.asList("GET", "POST","DELETE","PUT"));
+//						cfg.setAllowedMethods(Collections.singletonList("*"));
+//						cfg.setAllowCredentials(true);
+//						cfg.setAllowedHeaders(Collections.singletonList("*"));
+//						cfg.setExposedHeaders(Arrays.asList("Authorization"));
+//						cfg.setMaxAge(3600L);
+//						return cfg;
+//						
+//					}
+//				})
+//		.and()
+//		.httpBasic()
+//		.and()
+//		.formLogin();
+//		
+//		return http.build();
+//		
+//	}
+//	
+//	@Bean
+//	public PasswordEncoder passwordEncoder() {
+//		return new BCryptPasswordEncoder();
+//	}
+//
+//}
+
+
+
+
 package com.zosh.config;
 import java.util.Arrays;
 import java.util.Collections;
@@ -6,6 +84,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,7 +102,18 @@ public class AppConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
 		
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-		.authorizeHttpRequests(Authorize->Authorize.antMatchers("/api/**")
+		.authorizeHttpRequests(Authorize->Authorize.antMatchers("api/users/profile",
+				"api/admin/products/",
+				"api/products",
+				"/api/cart/",
+				"/api/cart/add",
+				"api/orders",
+				"api/cart_items/*",
+				"api/cart_items/cartItemId/",
+				"/api/payments/",
+				"api/payments/orderId",
+				"api/payments/*"
+				)
 				.authenticated()
 				.anyRequest()
 				.permitAll())
@@ -35,7 +126,8 @@ public class AppConfig {
 				CorsConfiguration cfg=new CorsConfiguration();
 				
 				cfg.setAllowedOrigins(Arrays.asList(
-						"http://localhost:3000"
+						"http://localhost:3000",
+						"https://meem-six-nu.vercel.app"
 						));
 				
 				cfg.setAllowedMethods(Collections.singletonList("*"));
@@ -50,6 +142,11 @@ public class AppConfig {
 		
 		return http.build();
 		
+	}
+	
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
 	}
 	
 	@Bean
